@@ -4,22 +4,24 @@ public class Board {
     private int width;
     private int height;
     private int mines;
-    private Cell[][] board;
+    private int openCells;
+    private Cell[][] cells;
 
     public Board(int width, int height, int mines){
         this.width = width;
         this.height = height;
         this.mines = mines;
+        this.openCells = 0;
         //Valida parámetros y si es correcto inicializa board
-        initBoard();
+        initCells();
         generateMines(mines);
     }
 
-    public void initBoard(){
-        board = new Cell[width][height];
+    public void initCells(){
+        cells = new Cell[width][height];
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                board[x][y] = new Cell();
+                cells[x][y] = new Cell();
             }
         }
     }
@@ -27,7 +29,7 @@ public class Board {
     public void printBoard(){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                System.out.print(board[x][y].isMine() ? (" X") : (" "+board[x][y].getValue()) );
+                System.out.print(cells[x][y].isMine() ? (" X") : (" "+ cells[x][y].getValue()) );
             }
             System.out.println();
         }
@@ -35,7 +37,7 @@ public class Board {
     public void printHiddenBoard(){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                System.out.print(board[x][y].isHidden() ? (" -") : (" "+board[x][y].getValue()) );
+                System.out.print(cells[x][y].isHidden() ? (" -") : (" "+ cells[x][y].getValue()) );
             }
             System.out.println();
         }
@@ -49,8 +51,8 @@ public class Board {
             int x = random%width;
             int y = random/width;
 //            System.out.println("R:"+r+" RANGE:"+range+" RANDOM:"+random+" X:"+x+" Y:"+y);
-            if(!board[x][y].isMine()){
-                board[x][y].setValue(-1);//-1 represents a mine
+            if(!cells[x][y].isMine()){
+                cells[x][y].setValue(-1);//-1 represents a mine
                 addOneAround(x, y);
                 mines--;
             }
@@ -60,9 +62,9 @@ public class Board {
     public void reveal(int x, int y){
         //Validar que sea una celda válida
         //Si la célda es válida entonces descubre
-        board[x][y].setHidden(false);
+        openCell(x, y);
 
-        if(board[x][y].getValue() == 0){//Explore
+        if(cells[x][y].getValue() == 0){//Explore
             revealAround(x, y);
 
 //            System.out.println("---- BOARD UPDATE ----");
@@ -81,7 +83,7 @@ public class Board {
                 }
             }while(way != -1);
         }else{
-            if(board[x][y].isMine()){
+            if(cells[x][y].isMine()){
                 System.out.println("Ya perdiste mi shavo");
             }
             //Si es número, valida que no sea el último y continua jugando
@@ -97,33 +99,35 @@ public class Board {
         int right = x+1;
         int up = y-1;
         int down = y+1;
-        if(isCell(left, up) && !board[left][up].isMine()){
-            board[left][up].cellPlusPlus();
+        if(isCell(left, up) && !cells[left][up].isMine()){
+            cells[left][up].cellPlusPlus();
         }
-        if(isCell(x, up) && !board[x][up].isMine()){
-            board[x][up].cellPlusPlus();
+        if(isCell(x, up) && !cells[x][up].isMine()){
+            cells[x][up].cellPlusPlus();
         }
-        if(isCell(right, up) && !board[right][up].isMine()){
-            board[right][up].cellPlusPlus();
-        }
-
-        if(isCell(left, y) && !board[left][y].isMine()){
-            board[left][y].cellPlusPlus();
-        }
-        if(isCell(right, y) && !board[right][y].isMine()){
-            board[right][y].cellPlusPlus();
+        if(isCell(right, up) && !cells[right][up].isMine()){
+            cells[right][up].cellPlusPlus();
         }
 
-        if(isCell(left, down) && !board[left][down].isMine()){
-            board[left][down].cellPlusPlus();
+        if(isCell(left, y) && !cells[left][y].isMine()){
+            cells[left][y].cellPlusPlus();
         }
-        if(isCell(x, down) && !board[x][down].isMine()){
-            board[x][down].cellPlusPlus();
+        if(isCell(right, y) && !cells[right][y].isMine()){
+            cells[right][y].cellPlusPlus();
         }
-        if(isCell(right, down) && !board[right][down].isMine()){
-            board[right][down].cellPlusPlus();
+
+        if(isCell(left, down) && !cells[left][down].isMine()){
+            cells[left][down].cellPlusPlus();
+        }
+        if(isCell(x, down) && !cells[x][down].isMine()){
+            cells[x][down].cellPlusPlus();
+        }
+        if(isCell(right, down) && !cells[right][down].isMine()){
+            cells[right][down].cellPlusPlus();
         }
     }
+
+
 
     private void revealAround(int x, int y){
         int left = x-1;
@@ -131,31 +135,24 @@ public class Board {
         int up = y-1;
         int down = y+1;
 
-        if(isCell(left, up)){
-            board[left][up].setHidden(false);
-        }
-        if(isCell(x, up)){
-            board[x][up].setHidden(false);
-        }
-        if(isCell(right, up)){
-            board[right][up].setHidden(false);
-        }
+        openCell(left,up);
+        openCell(x,up);
+        openCell(right,up);
 
-        if(isCell(left, y)){
-            board[left][y].setHidden(false);
-        }
-        if(isCell(right, y)){
-            board[right][y].setHidden(false);
-        }
+        openCell(left,y);
+        openCell(right,y);
 
-        if(isCell(left, down)){
-            board[left][down].setHidden(false);
-        }
-        if(isCell(x, down)){
-            board[x][down].setHidden(false);
-        }
-        if(isCell(right, down)){
-            board[right][down].setHidden(false);
+        openCell(left,down);
+        openCell(x,down);
+        openCell(right,down);
+    }
+
+    private void openCell(int x, int y){
+        if(isCell(x,y)) {
+            if (cells[x][y].isHidden()) {
+                cells[x][y].setHidden(false);
+                openCells++;
+            }
         }
     }
 
@@ -201,7 +198,7 @@ public class Board {
 
     private boolean isWay(int x, int y){
         if(isCell(x, y)){
-            if(board[x][y].getValue() == 0){
+            if(cells[x][y].getValue() == 0){
                 if(isNextToHiddenCell(x, y)){
                     return true;
                 }
@@ -216,30 +213,30 @@ public class Board {
         int up = y-1;
         int down = y+1;
 
-        if(isCell(left, up) && board[left][up].isHidden()){
+        if(isCell(left, up) && cells[left][up].isHidden()){
             return true;
         }
-        if(isCell(x, up) && board[x][up].isHidden()){
+        if(isCell(x, up) && cells[x][up].isHidden()){
             return true;
         }
-        if(isCell(right, up) && board[right][up].isHidden()){
-            return true;
-        }
-
-        if(isCell(left, y) && board[left][y].isHidden()){
-            return true;
-        }
-        if(isCell(right, y) && board[right][y].isHidden()){
+        if(isCell(right, up) && cells[right][up].isHidden()){
             return true;
         }
 
-        if(isCell(left, down) && board[left][down].isHidden()){
+        if(isCell(left, y) && cells[left][y].isHidden()){
             return true;
         }
-        if(isCell(x, down) && board[x][down].isHidden()){
+        if(isCell(right, y) && cells[right][y].isHidden()){
             return true;
         }
-        if(isCell(right, down) && board[right][down].isHidden()){
+
+        if(isCell(left, down) && cells[left][down].isHidden()){
+            return true;
+        }
+        if(isCell(x, down) && cells[x][down].isHidden()){
+            return true;
+        }
+        if(isCell(right, down) && cells[right][down].isHidden()){
             return true;
         }
 
@@ -272,11 +269,19 @@ public class Board {
         this.mines = mines;
     }
 
-    public Cell[][] getBoard() {
-        return board;
+    public int getOpenCells() {
+        return openCells;
     }
 
-    public void setBoard(Cell[][] board) {
-        this.board = board;
+    public void setOpenCells(int n) {
+        this.openCells = n;
+    }
+
+    public Cell[][] getCells() {
+        return cells;
+    }
+
+    public void setCells(Cell[][] cells) {
+        this.cells = cells;
     }
 }
