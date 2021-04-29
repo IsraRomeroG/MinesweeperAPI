@@ -5,13 +5,15 @@ public class Board {
     private int height;
     private int mines;
     private int openCells;
+    private int status;
     private Cell[][] cells;
 
     public Board(int width, int height, int mines){
-        this.width = width;
-        this.height = height;
+        this.width = height;
+        this.height = width;
         this.mines = mines;
         this.openCells = 0;
+        this.status = 0;
         //Valida parámetros y si es correcto inicializa board
         initCells();
         generateMines(mines);
@@ -21,7 +23,7 @@ public class Board {
         cells = new Cell[width][height];
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                cells[x][y] = new Cell();
+                cells[x][y] = new Cell(getSequentialNumber(x,y));
             }
         }
     }
@@ -29,7 +31,7 @@ public class Board {
     public void printBoard(){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                System.out.print(cells[x][y].isMine() ? (" X") : (" "+ cells[x][y].getValue()) );
+                System.out.print(cells[x][y].esMina() ? (" X") : (" "+ cells[x][y].getValue()) );
             }
             System.out.println();
         }
@@ -51,12 +53,18 @@ public class Board {
             int x = random%width;
             int y = random/width;
 //            System.out.println("R:"+r+" RANGE:"+range+" RANDOM:"+random+" X:"+x+" Y:"+y);
-            if(!cells[x][y].isMine()){
+            if(!cells[x][y].esMina()){
                 cells[x][y].setValue(-1);//-1 represents a mine
                 addOneAround(x, y);
                 mines--;
             }
         }
+    }
+
+    public void reveal(int id){
+        int y = id/width;
+        int x = id%width;
+        reveal(x, y);
     }
 
     public void reveal(int x, int y){
@@ -83,8 +91,16 @@ public class Board {
                 }
             }while(way != -1);
         }else{
-            if(cells[x][y].isMine()){
-                System.out.println("Ya perdiste mi shavo");
+            if(cells[x][y].esMina()){
+                this.status = -1;
+                revealAll();
+                System.out.println("Ya perdiste mi shavo :(");
+            }
+            System.out.println();
+            if((height*width) == (openCells+mines)){
+                this.status = 1;
+                revealAll();
+                System.out.println("You are the winner madafaca");
             }
             //Si es número, valida que no sea el último y continua jugando
             //0 -> Continue, 1 -> Win, -1 -> Loose
@@ -99,35 +115,42 @@ public class Board {
         int right = x+1;
         int up = y-1;
         int down = y+1;
-        if(isCell(left, up) && !cells[left][up].isMine()){
+        if(isCell(left, up) && !cells[left][up].esMina()){
             cells[left][up].cellPlusPlus();
         }
-        if(isCell(x, up) && !cells[x][up].isMine()){
+        if(isCell(x, up) && !cells[x][up].esMina()){
             cells[x][up].cellPlusPlus();
         }
-        if(isCell(right, up) && !cells[right][up].isMine()){
+        if(isCell(right, up) && !cells[right][up].esMina()){
             cells[right][up].cellPlusPlus();
         }
 
-        if(isCell(left, y) && !cells[left][y].isMine()){
+        if(isCell(left, y) && !cells[left][y].esMina()){
             cells[left][y].cellPlusPlus();
         }
-        if(isCell(right, y) && !cells[right][y].isMine()){
+        if(isCell(right, y) && !cells[right][y].esMina()){
             cells[right][y].cellPlusPlus();
         }
 
-        if(isCell(left, down) && !cells[left][down].isMine()){
+        if(isCell(left, down) && !cells[left][down].esMina()){
             cells[left][down].cellPlusPlus();
         }
-        if(isCell(x, down) && !cells[x][down].isMine()){
+        if(isCell(x, down) && !cells[x][down].esMina()){
             cells[x][down].cellPlusPlus();
         }
-        if(isCell(right, down) && !cells[right][down].isMine()){
+        if(isCell(right, down) && !cells[right][down].esMina()){
             cells[right][down].cellPlusPlus();
         }
     }
 
-
+    private void revealAll(){
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                cells[x][y].setHidden(false);
+            }
+            System.out.println();
+        }
+    }
 
     private void revealAround(int x, int y){
         int left = x-1;
@@ -269,19 +292,19 @@ public class Board {
         this.mines = mines;
     }
 
-    public int getOpenCells() {
-        return openCells;
-    }
-
-    public void setOpenCells(int n) {
-        this.openCells = n;
-    }
-
     public Cell[][] getCells() {
         return cells;
     }
 
     public void setCells(Cell[][] cells) {
         this.cells = cells;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

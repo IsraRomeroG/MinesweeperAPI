@@ -16,6 +16,8 @@ public class GameService {
 
     public Game newGame(int width, int height, int mines){
         Game game = new Game(width, height, mines);
+        System.out.println("-- New Game Started --");
+        game.getBoard().printBoard();
         gameDAO.save(game);
         return game;
     }
@@ -30,7 +32,15 @@ public class GameService {
         return board;
     }
 
-
+    public Board playGame(UUID id, int cellid){
+        //Faltan validaciones
+        Board board = gameDAO.load(id);
+        board.reveal(cellid);
+        System.out.println("-- I'm playing the game --");
+        board.printHiddenBoard();
+        gameDAO.save(new Game(id, board));
+        return board;
+    }
 
     public Board loadGame(UUID id){
         return gameDAO.load(id);

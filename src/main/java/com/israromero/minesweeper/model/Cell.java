@@ -1,10 +1,12 @@
 package com.israromero.minesweeper.model;
 
 public class Cell {
+    private int id;
     private int value;
     private boolean hidden;
 
-    public Cell(){
+    public Cell(int id){
+        this.id = id;
         this.hidden = true;
         this.value = 0;
     }
@@ -13,7 +15,7 @@ public class Cell {
         value++;
     }
 
-    public boolean isMine(){
+    public boolean esMina(){
         return (value == -1);
     }
 
@@ -31,5 +33,9 @@ public class Cell {
 
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

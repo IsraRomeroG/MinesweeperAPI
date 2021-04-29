@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/minesweeper/v1/")
 public class GameController {
 
@@ -25,6 +26,11 @@ public class GameController {
     @PutMapping("{id}/{x}/{y}")
     public Board playGame(@PathVariable("id") UUID id, @PathVariable("x") int x, @PathVariable("y") int y){
         return gameService.playGame(id, x, y);
+    }
+
+    @GetMapping("{id}/{cellId}")
+    public Board playGame(@PathVariable("id") UUID id, @PathVariable("cellId") int cellId){
+        return gameService.playGame(id, cellId);
     }
 
     //Save Game
