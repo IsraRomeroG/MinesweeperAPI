@@ -95,9 +95,7 @@ public class Board {
                 this.status = -1;
                 revealAll();
                 System.out.println("Ya perdiste mi shavo :(");
-            }
-            System.out.println();
-            if((height*width) == (openCells+mines)){
+            }else if((height*width) == (openCells+mines)){
                 this.status = 1;
                 revealAll();
                 System.out.println("You are the winner madafaca");
