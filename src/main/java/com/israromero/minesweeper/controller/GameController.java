@@ -2,10 +2,12 @@ package com.israromero.minesweeper.controller;
 
 import com.israromero.minesweeper.model.Board;
 import com.israromero.minesweeper.model.Game;
+import com.israromero.minesweeper.model.User;
 import com.israromero.minesweeper.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 @RestController
@@ -34,10 +36,25 @@ public class GameController {
     }
 
     //Save Game
+    @PostMapping("{id}/{user}")
+    public boolean saveGame(@PathVariable("id") UUID id, @PathVariable("user") String user){
+        return gameService.saveGame(id, user);
+    }
 
     //Load Game
     @GetMapping("{id}")
     public Board loadGame(@PathVariable("id") UUID id){
-        return gameService.loadGame(id);
+        return gameService.loadUser(id);
+    }
+
+    @PostMapping("users/{user}")
+    public int newUser(@PathVariable("user") String user, ArrayList<String> games){
+        gameService.newUser(user);
+        return 1;
+    }
+
+    @GetMapping("users/{user}")
+    public User loadUser(@PathVariable("user") String user){
+        return gameService.loadUser(user);
     }
 }
