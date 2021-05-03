@@ -32,7 +32,7 @@ public class GameService {
         board.reveal(x, y);
         System.out.println("-- I'm playing the game --");
         board.printHiddenBoard();
-        gameDAO.save(new Game(id, null, board));
+        gameDAO.save(new Game(id, board));
         return board;
     }
 
@@ -42,7 +42,7 @@ public class GameService {
         board.reveal(cellid);
         System.out.println("-- I'm playing the game --");
         board.printHiddenBoard();
-        gameDAO.save(new Game(id, null, board));
+        gameDAO.save(new Game(id, board));
         return board;
     }
 

@@ -8,13 +8,10 @@ public class Game {
     @JsonProperty
     private final UUID id;
     @JsonProperty
-    private String user;
-    @JsonProperty
     private Board board;
 
-    public Game(UUID id, String user, Board board){
+    public Game(UUID id, Board board){
         this.id = id;
-        this.user = user;
         this.board = board;
     }
 
@@ -31,11 +28,4 @@ public class Game {
         return board;
     }
 
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
 }
